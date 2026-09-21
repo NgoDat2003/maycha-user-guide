@@ -14,6 +14,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           antd: ["antd", "@ant-design/icons"],
+          docx: ["docx"],
         },
       },
     },

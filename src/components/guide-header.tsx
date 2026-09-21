@@ -1,6 +1,8 @@
-import { Input, Tag, Button } from 'antd';
-import { MenuOutlined, PrinterOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { Input, Tag, Button, Tooltip, message } from 'antd';
+import { MenuOutlined, FileWordOutlined, PrinterOutlined } from '@ant-design/icons';
 import type { GuideContent } from '../types/guide';
+import { exportGuideToDocx } from '../lib/export-docx';
 
 interface GuideHeaderProps {
   guide: GuideContent;
@@ -21,6 +23,43 @@ export function GuideHeader({
   onSearchChange,
   onOpenMobileToc,
 }: GuideHeaderProps) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportWord = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    message.loading({
+      content: 'Đang chuẩn bị xuất file Word (.docx)...',
+      key: 'docx-export-key',
+      duration: 0,
+    });
+
+    try {
+      await exportGuideToDocx(guide, (percent, status) => {
+        message.loading({
+          content: `${status} (${percent}%)`,
+          key: 'docx-export-key',
+          duration: 0,
+        });
+      });
+      message.success({
+        content: 'Đã tải cẩm nang hướng dẫn sử dụng Maycha (.docx) thành công!',
+        key: 'docx-export-key',
+        duration: 4,
+      });
+    } catch (err: unknown) {
+      console.error('Lỗi khi xuất Word:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
+      message.error({
+        content: `Không thể xuất file Word: ${errorMessage}`,
+        key: 'docx-export-key',
+        duration: 5,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <header className="guide-header">
       <div className="guide-header-inner">
@@ -53,14 +92,27 @@ export function GuideHeader({
             onChange={(e) => onSearchChange(e.target.value)}
           />
 
-          <Button
-            icon={<PrinterOutlined />}
-            onClick={() => window.print()}
-            className="print-btn"
-            title="In cẩm nang / Xuất PDF"
-          >
-            In tài liệu
-          </Button>
+          <div className="doc-actions-group">
+            <Tooltip title="Xuất toàn bộ cẩm nang hướng dẫn ra file Word (.docx) chuẩn báo cáo thuyết trình kèm mục lục đầy đủ">
+              <Button
+                type="primary"
+                icon={<FileWordOutlined />}
+                onClick={handleExportWord}
+                loading={isExporting}
+                className="export-word-btn"
+              >
+                {isExporting ? 'Đang xuất Word...' : 'Xuất file Word (.docx)'}
+              </Button>
+            </Tooltip>
+            <Tooltip title="In tài liệu / Lưu PDF trình duyệt">
+              <Button
+                icon={<PrinterOutlined />}
+                onClick={() => window.print()}
+                className="print-btn"
+                aria-label="In tài liệu"
+              />
+            </Tooltip>
+          </div>
         </div>
       </div>
     </header>

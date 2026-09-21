@@ -112,6 +112,31 @@ a {
   width: 260px;
 }
 
+.doc-actions-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-word-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--brand-navy) !important;
+  border-color: var(--brand-navy) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 76, 129, 0.15);
+  transition: all 0.2s ease;
+}
+
+.export-word-btn:hover {
+  background-color: #0c3c66 !important;
+  border-color: #0c3c66 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(15, 76, 129, 0.25);
+}
+
 /* Layout */
 .guide-main-layout {
   display: flex;
